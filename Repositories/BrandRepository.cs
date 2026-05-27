@@ -25,8 +25,8 @@ public sealed class BrandRepository : IBrandRepository
     public async Task<int> CreateAsync(CreateBrandRequest request)
     {
         const string sql = """
-            INSERT INTO brands (name, country)
-            VALUES (@name, @country);
+            INSERT INTO Brands (Name, Country)
+            VALUES (@Name, @Country);
 
             SELECT LAST_INSERT_ID();
             """;
@@ -35,8 +35,8 @@ public sealed class BrandRepository : IBrandRepository
         await connection.OpenAsync();
 
         await using MySqlCommand command = new MySqlCommand(sql, connection);
-        command.Parameters.AddWithValue("@name", request.Name);
-        command.Parameters.AddWithValue("@country", request.Country);
+        command.Parameters.AddWithValue("@Name", request.Name);
+        command.Parameters.AddWithValue("@Country", request.Country);
 
         object? result = await command.ExecuteScalarAsync();
 
@@ -46,9 +46,9 @@ public sealed class BrandRepository : IBrandRepository
     public async Task<IReadOnlyList<BrandResponse>> GetAllAsync()
     {
         const string sql = """
-            SELECT brand_id, name, country
-            FROM brands
-            ORDER BY brand_id;
+            SELECT ID, Name, Country
+            FROM Brands
+            ORDER BY ID;
             """;
 
         List<BrandResponse> brands = new();
@@ -62,9 +62,9 @@ public sealed class BrandRepository : IBrandRepository
         while (await reader.ReadAsync())
         {
             brands.Add(new BrandResponse(
-                BrandId: reader.GetInt32("brand_id"),
-                Name: reader.GetString("name"),
-                Country: reader.GetString("country")
+                BrandId: reader.GetInt32("ID"),
+                Name: reader.GetString("Name"),
+                Country: reader.GetString("Country")
             ));
         }
 
@@ -74,16 +74,16 @@ public sealed class BrandRepository : IBrandRepository
     public async Task<BrandResponse?> GetByIdAsync(int id)
     {
         const string sql = """
-            SELECT brand_id, name, country
-            FROM brands
-            WHERE brand_id = @id;
+            SELECT ID, Name, Country
+            FROM Brands
+            WHERE ID = @ID;
             """;
 
         await using MySqlConnection connection = _connectionFactory.CreateConnection();
         await connection.OpenAsync();
 
         await using MySqlCommand command = new MySqlCommand(sql, connection);
-        command.Parameters.AddWithValue("@id", id);
+        command.Parameters.AddWithValue("@ID", id);
 
         await using MySqlDataReader reader = await command.ExecuteReaderAsync();
 
@@ -93,28 +93,28 @@ public sealed class BrandRepository : IBrandRepository
         }
 
         return new BrandResponse(
-            BrandId: reader.GetInt32("brand_id"),
-            Name: reader.GetString("name"),
-            Country: reader.GetString("country")
+            BrandId: reader.GetInt32("ID"),
+            Name: reader.GetString("Name"),
+            Country: reader.GetString("Country")
         );
     }
 
     public async Task<bool> UpdateAsync(int id, UpdateBrandRequest request)
     {
         const string sql = """
-            UPDATE brands
-            SET name = @name,
-                country = @country
-            WHERE brand_id = @id;
+            UPDATE Brands
+            SET Name = @Name,
+                Country = @Country
+            WHERE ID = @ID;
             """;
 
         await using MySqlConnection connection = _connectionFactory.CreateConnection();
         await connection.OpenAsync();
 
         await using MySqlCommand command = new MySqlCommand(sql, connection);
-        command.Parameters.AddWithValue("@id", id);
-        command.Parameters.AddWithValue("@name", request.Name);
-        command.Parameters.AddWithValue("@country", request.Country);
+        command.Parameters.AddWithValue("@ID", id);
+        command.Parameters.AddWithValue("@Name", request.Name);
+        command.Parameters.AddWithValue("@Country", request.Country);
 
         int affectedRows = await command.ExecuteNonQueryAsync();
 
@@ -124,15 +124,15 @@ public sealed class BrandRepository : IBrandRepository
     public async Task<bool> DeleteAsync(int id)
     {
         const string sql = """
-            DELETE FROM brands
-            WHERE brand_id = @id;
+            DELETE FROM Brands
+            WHERE ID = @ID;
             """;
 
         await using MySqlConnection connection = _connectionFactory.CreateConnection();
         await connection.OpenAsync();
 
         await using MySqlCommand command = new MySqlCommand(sql, connection);
-        command.Parameters.AddWithValue("@id", id);
+        command.Parameters.AddWithValue("@ID", id);
 
         int affectedRows = await command.ExecuteNonQueryAsync();
 

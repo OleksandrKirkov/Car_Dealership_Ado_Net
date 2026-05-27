@@ -25,19 +25,19 @@ public sealed class ClientRepository : IClientRepository
     public async Task<int> CreateAsync(CreateClientRequest request)
     {
         const string sql = """
-            INSERT INTO clients (
-                first_name,
-                last_name,
-                phone,
-                email,
-                passport_number
+            INSERT INTO Clients (
+                First_Name,
+                Last_Name,
+                Phone,
+                Email,
+                Passport_Number
             )
             VALUES (
-                @firstName,
-                @lastName,
-                @phone,
-                @email,
-                @passportNumber
+                @FirstName,
+                @LastName,
+                @Phone,
+                @Email,
+                @PassportNumber
             );
 
             SELECT LAST_INSERT_ID();
@@ -47,11 +47,11 @@ public sealed class ClientRepository : IClientRepository
         await connection.OpenAsync();
 
         await using MySqlCommand command = new MySqlCommand(sql, connection);
-        command.Parameters.AddWithValue("@firstName", request.FirstName);
-        command.Parameters.AddWithValue("@lastName", request.LastName);
-        command.Parameters.AddWithValue("@phone", request.Phone);
-        command.Parameters.AddWithValue("@email", request.Email);
-        command.Parameters.AddWithValue("@passportNumber", request.PassportNumber);
+        command.Parameters.AddWithValue("@FirstName", request.FirstName);
+        command.Parameters.AddWithValue("@LastName", request.LastName);
+        command.Parameters.AddWithValue("@Phone", request.Phone);
+        command.Parameters.AddWithValue("@Email", request.Email);
+        command.Parameters.AddWithValue("@PassportNumber", request.PassportNumber);
 
         object? result = await command.ExecuteScalarAsync();
 
@@ -62,14 +62,14 @@ public sealed class ClientRepository : IClientRepository
     {
         const string sql = """
             SELECT
-                client_id,
-                first_name,
-                last_name,
-                phone,
-                email,
-                passport_number
-            FROM clients
-            ORDER BY client_id;
+                ID,
+                First_Name,
+                Last_Name,
+                Phone,
+                Email,
+                Passport_Number
+            FROM Clients
+            ORDER BY ID;
             """;
 
         List<ClientResponse> clients = new();
@@ -83,12 +83,12 @@ public sealed class ClientRepository : IClientRepository
         while (await reader.ReadAsync())
         {
             clients.Add(new ClientResponse(
-                ClientId: reader.GetInt32("client_id"),
-                FirstName: reader.GetString("first_name"),
-                LastName: reader.GetString("last_name"),
-                Phone: reader.GetString("phone"),
-                Email: reader.GetString("email"),
-                PassportNumber: reader.GetString("passport_number")
+                ClientId: reader.GetInt32("ID"),
+                FirstName: reader.GetString("First_Name"),
+                LastName: reader.GetString("Last_Name"),
+                Phone: reader.GetString("Phone"),
+                Email: reader.GetString("Email"),
+                PassportNumber: reader.GetString("Passport_Number")
             ));
         }
 
@@ -99,21 +99,21 @@ public sealed class ClientRepository : IClientRepository
     {
         const string sql = """
             SELECT
-                client_id,
-                first_name,
-                last_name,
-                phone,
-                email,
-                passport_number
-            FROM clients
-            WHERE client_id = @id;
+                ID,
+                First_Name,
+                Last_Name,
+                Phone,
+                Email,
+                Passport_Number
+            FROM Clients
+            WHERE ID = @ID;
             """;
 
         await using MySqlConnection connection = _connectionFactory.CreateConnection();
         await connection.OpenAsync();
 
         await using MySqlCommand command = new MySqlCommand(sql, connection);
-        command.Parameters.AddWithValue("@id", id);
+        command.Parameters.AddWithValue("@ID", id);
 
         await using MySqlDataReader reader = await command.ExecuteReaderAsync();
 
@@ -123,37 +123,37 @@ public sealed class ClientRepository : IClientRepository
         }
 
         return new ClientResponse(
-            ClientId: reader.GetInt32("client_id"),
-            FirstName: reader.GetString("first_name"),
-            LastName: reader.GetString("last_name"),
-            Phone: reader.GetString("phone"),
-            Email: reader.GetString("email"),
-            PassportNumber: reader.GetString("passport_number")
+            ClientId: reader.GetInt32("ID"),
+            FirstName: reader.GetString("First_Name"),
+            LastName: reader.GetString("Last_Name"),
+            Phone: reader.GetString("Phone"),
+            Email: reader.GetString("Email"),
+            PassportNumber: reader.GetString("Passport_Number")
         );
     }
 
     public async Task<bool> UpdateAsync(int id, UpdateClientRequest request)
     {
         const string sql = """
-            UPDATE clients
-            SET first_name = @firstName,
-                last_name = @lastName,
-                phone = @phone,
-                email = @email,
-                passport_number = @passportNumber
-            WHERE client_id = @id;
+            UPDATE Clients
+            SET First_Name = @FirstName,
+                Last_Name = @LastName,
+                Phone = @phone,
+                Email = @Email,
+                Passport_Number = @PassportNumber
+            WHERE ID = @ID;
             """;
 
         await using MySqlConnection connection = _connectionFactory.CreateConnection();
         await connection.OpenAsync();
 
         await using MySqlCommand command = new MySqlCommand(sql, connection);
-        command.Parameters.AddWithValue("@id", id);
-        command.Parameters.AddWithValue("@firstName", request.FirstName);
-        command.Parameters.AddWithValue("@lastName", request.LastName);
-        command.Parameters.AddWithValue("@phone", request.Phone);
-        command.Parameters.AddWithValue("@email", request.Email);
-        command.Parameters.AddWithValue("@passportNumber", request.PassportNumber);
+        command.Parameters.AddWithValue("@ID", id);
+        command.Parameters.AddWithValue("@FirstName", request.FirstName);
+        command.Parameters.AddWithValue("@LastName", request.LastName);
+        command.Parameters.AddWithValue("@Phone", request.Phone);
+        command.Parameters.AddWithValue("@Email", request.Email);
+        command.Parameters.AddWithValue("@PassportNumber", request.PassportNumber);
 
         int affectedRows = await command.ExecuteNonQueryAsync();
 
@@ -163,15 +163,15 @@ public sealed class ClientRepository : IClientRepository
     public async Task<bool> DeleteAsync(int id)
     {
         const string sql = """
-            DELETE FROM clients
-            WHERE client_id = @id;
+            DELETE FROM Clients
+            WHERE ID = @ID;
             """;
 
         await using MySqlConnection connection = _connectionFactory.CreateConnection();
         await connection.OpenAsync();
 
         await using MySqlCommand command = new MySqlCommand(sql, connection);
-        command.Parameters.AddWithValue("@id", id);
+        command.Parameters.AddWithValue("@ID", id);
 
         int affectedRows = await command.ExecuteNonQueryAsync();
 

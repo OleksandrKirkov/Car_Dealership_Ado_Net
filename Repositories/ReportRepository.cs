@@ -26,22 +26,22 @@ public sealed class ReportRepository : IReportRepository
     {
         const string sql = """
             SELECT
-                sales.sale_id,
-                sales.sale_date,
-                CONCAT(clients.first_name, ' ', clients.last_name) AS client,
-                CONCAT(employees.first_name, ' ', employees.last_name) AS employee,
-                brands.name AS brand,
-                car_models.name AS model,
-                cars.vin,
-                sales.final_price,
-                sales.payment_status
-            FROM sales
-            JOIN clients ON sales.client_id = clients.client_id
-            JOIN employees ON sales.employee_id = employees.employee_id
-            JOIN cars ON sales.car_id = cars.car_id
-            JOIN car_models ON cars.model_id = car_models.model_id
-            JOIN brands ON car_models.brand_id = brands.brand_id
-            ORDER BY sales.sale_date DESC;
+                Sales.ID,
+                Sales.Sale_Date,
+                CONCAT(Clients.First_Name, ' ', Clients.Last_Name) AS Client,
+                CONCAT(Employees.First_name, ' ', Employees.Last_Name) AS Employee,
+                Brands.Name AS Brand,
+                Car_Models.Name AS Model,
+                Cars.Vin,
+                Sales.Final_Price,
+                Sales.Payment_Status
+            FROM Sales
+            JOIN Clients ON Sales.Client_ID = Clients.ID
+            JOIN Employees ON Sales.Employee_ID = Employees.ID
+            JOIN Cars ON Sales.Car_ID = Cars.ID
+            JOIN Car_Models ON Cars.Model_ID = Car_Models.ID
+            JOIN Brands ON Car_Models.Brand_ID = Brands.ID
+            ORDER BY Sales.Sale_Date DESC;
             """;
 
         List<SaleJoinResponse> sales = new();
@@ -55,15 +55,15 @@ public sealed class ReportRepository : IReportRepository
         while (await reader.ReadAsync())
         {
             sales.Add(new SaleJoinResponse(
-                SaleId: reader.GetInt32("sale_id"),
-                SaleDate: reader.GetDateTime("sale_date"),
-                Client: reader.GetString("client"),
-                Employee: reader.GetString("employee"),
-                Brand: reader.GetString("brand"),
-                Model: reader.GetString("model"),
-                Vin: reader.GetString("vin"),
-                FinalPrice: reader.GetDecimal("final_price"),
-                PaymentStatus: reader.GetString("payment_status")
+                SaleId: reader.GetInt32("ID"),
+                SaleDate: reader.GetDateTime("Sale_Date"),
+                Client: reader.GetString("Client"),
+                Employee: reader.GetString("Employee"),
+                Brand: reader.GetString("Brand"),
+                Model: reader.GetString("Model"),
+                Vin: reader.GetString("Vin"),
+                FinalPrice: reader.GetDecimal("Final_Price"),
+                PaymentStatus: reader.GetString("Payment_Status")
             ));
         }
 
@@ -74,23 +74,23 @@ public sealed class ReportRepository : IReportRepository
     {
         const string sql = """
             SELECT
-                cars.car_id,
-                brands.name AS brand,
-                car_models.name AS model,
-                suppliers.name AS supplier,
-                cars.vin,
-                cars.manufacture_year,
-                cars.color,
-                cars.mileage,
-                cars.price,
-                cars.status
-            FROM cars
-            JOIN car_models ON cars.model_id = car_models.model_id
-            JOIN brands ON car_models.brand_id = brands.brand_id
-            JOIN suppliers ON cars.supplier_id = suppliers.supplier_id
-            WHERE cars.status = 'available'
-              AND cars.price <= @maxPrice
-            ORDER BY cars.price ASC;
+                Cars.ID,
+                Brands.Name AS Brand,
+                Car_Models.Name AS Model,
+                Suppliers.Name AS Supplier,
+                Cars.Vin,
+                Cars.Manufacture_Year,
+                Cars.Color,
+                Cars.Mileage,
+                Cars.Price,
+                Cars.Status
+            FROM Cars
+            JOIN Car_Models ON Cars.Model_ID = Car_Models.ID
+            JOIN Brands ON Car_Models.Brand_ID = Brands.ID
+            JOIN Suppliers ON Cars.Supplier_ID = Suppliers.ID
+            WHERE Cars.Status = 'available'
+              AND Cars.Price <= @maxPrice
+            ORDER BY Cars.Price ASC;
             """;
 
         List<CarViewResponse> cars = new();
@@ -115,16 +115,16 @@ public sealed class ReportRepository : IReportRepository
     {
         const string sql = """
             SELECT
-                brands.name AS brand,
-                COUNT(cars.car_id) AS cars_count,
-                MIN(cars.price) AS min_price,
-                MAX(cars.price) AS max_price,
-                ROUND(AVG(cars.price), 2) AS average_price
-            FROM brands
-            JOIN car_models ON brands.brand_id = car_models.brand_id
-            JOIN cars ON car_models.model_id = cars.model_id
-            GROUP BY brands.brand_id, brands.name
-            ORDER BY cars_count DESC;
+                Brands.Name AS Brand,
+                COUNT(Cars.ID) AS Cars_Count,
+                MIN(Cars.Price) AS Min_Price,
+                MAX(Cars.Price) AS Max_Price,
+                ROUND(AVG(Cars.Price), 2) AS Average_Price
+            FROM Brands
+            JOIN Car_Models ON Brands.ID = Car_Models.Brand_ID
+            JOIN Cars ON Car_Models.ID = Cars.Model_ID
+            GROUP BY Brands.ID, Brands.Name
+            ORDER BY Cars_Count DESC;
             """;
 
         List<CarsCountByBrandResponse> rows = new();
@@ -138,11 +138,11 @@ public sealed class ReportRepository : IReportRepository
         while (await reader.ReadAsync())
         {
             rows.Add(new CarsCountByBrandResponse(
-                Brand: reader.GetString("brand"),
-                CarsCount: reader.GetInt32("cars_count"),
-                MinPrice: reader.GetDecimal("min_price"),
-                MaxPrice: reader.GetDecimal("max_price"),
-                AveragePrice: reader.GetDecimal("average_price")
+                Brand: reader.GetString("Brand"),
+                CarsCount: reader.GetInt32("Cars_Count"),
+                MinPrice: reader.GetDecimal("Min_Price"),
+                MaxPrice: reader.GetDecimal("Max_Price"),
+                AveragePrice: reader.GetDecimal("Average_Price")
             ));
         }
 
@@ -153,12 +153,12 @@ public sealed class ReportRepository : IReportRepository
     {
         const string sql = """
             SELECT
-                COUNT(*) AS sales_count,
-                COALESCE(SUM(final_price), 0) AS total_sales_amount,
-                COALESCE(AVG(final_price), 0) AS average_sale_amount,
-                COALESCE(MIN(final_price), 0) AS min_sale_amount,
-                COALESCE(MAX(final_price), 0) AS max_sale_amount
-            FROM sales;
+                COUNT(*) AS Sales_Count,
+                COALESCE(SUM(Final_Price), 0) AS Total_Sales_Amount,
+                COALESCE(AVG(Final_Price), 0) AS Average_Sale_Amount,
+                COALESCE(MIN(Final_Price), 0) AS Min_Sale_Amount,
+                COALESCE(MAX(Final_Price), 0) AS Max_Sale_Amount
+            FROM Sales;
             """;
 
         await using MySqlConnection connection = _connectionFactory.CreateConnection();
@@ -179,11 +179,11 @@ public sealed class ReportRepository : IReportRepository
         }
 
         return new TotalSalesResponse(
-            SalesCount: reader.GetInt32("sales_count"),
-            TotalSalesAmount: reader.GetDecimal("total_sales_amount"),
-            AverageSaleAmount: reader.GetDecimal("average_sale_amount"),
-            MinSaleAmount: reader.GetDecimal("min_sale_amount"),
-            MaxSaleAmount: reader.GetDecimal("max_sale_amount")
+            SalesCount: reader.GetInt32("Sales_Count"),
+            TotalSalesAmount: reader.GetDecimal("Total_Sales_Amount"),
+            AverageSaleAmount: reader.GetDecimal("Average_Sale_Amount"),
+            MinSaleAmount: reader.GetDecimal("Min_Sale_Amount"),
+            MaxSaleAmount: reader.GetDecimal("Max_Sale_Amount")
         );
     }
 
@@ -191,22 +191,22 @@ public sealed class ReportRepository : IReportRepository
     {
         const string sql = """
             SELECT
-                sales.sale_id,
-                CONCAT(clients.first_name, ' ', clients.last_name) AS client,
-                sales.final_price,
-                COALESCE(SUM(payments.amount), 0) AS paid_amount,
-                sales.final_price - COALESCE(SUM(payments.amount), 0) AS remaining_amount,
-                sales.payment_status
-            FROM sales
-            JOIN clients ON sales.client_id = clients.client_id
-            LEFT JOIN payments ON sales.sale_id = payments.sale_id
+                Sales.ID,
+                CONCAT(Clients.First_Name, ' ', Clients.Last_Name) AS Client,
+                Sales.Final_Price,
+                COALESCE(SUM(Payments.Amount), 0) AS Paid_Amount,
+                Sales.Final_Price - COALESCE(SUM(Payments.Amount), 0) AS Remaining_Amount,
+                Sales.Payment_Status
+            FROM Sales
+            JOIN Clients ON Sales.Client_ID = Clients.ID
+            LEFT JOIN Payments ON Sales.ID = Payments.Sale_ID
             GROUP BY
-                sales.sale_id,
-                clients.first_name,
-                clients.last_name,
-                sales.final_price,
-                sales.payment_status
-            ORDER BY sales.sale_id;
+                Sales.ID,
+                Clients.First_Name,
+                Clients.Last_Name,
+                Sales.Final_Price,
+                Sales.Payment_Status
+            ORDER BY Sales.ID;
             """;
 
         List<PaymentBySaleResponse> rows = new();
@@ -220,12 +220,12 @@ public sealed class ReportRepository : IReportRepository
         while (await reader.ReadAsync())
         {
             rows.Add(new PaymentBySaleResponse(
-                SaleId: reader.GetInt32("sale_id"),
-                Client: reader.GetString("client"),
-                FinalPrice: reader.GetDecimal("final_price"),
-                PaidAmount: reader.GetDecimal("paid_amount"),
-                RemainingAmount: reader.GetDecimal("remaining_amount"),
-                PaymentStatus: reader.GetString("payment_status")
+                SaleId: reader.GetInt32("ID"),
+                Client: reader.GetString("Client"),
+                FinalPrice: reader.GetDecimal("Final_Price"),
+                PaidAmount: reader.GetDecimal("Paid_Amount"),
+                RemainingAmount: reader.GetDecimal("Remaining_Amount"),
+                PaymentStatus: reader.GetString("Payment_Status")
             ));
         }
 
@@ -235,16 +235,16 @@ public sealed class ReportRepository : IReportRepository
     private static CarViewResponse ReadCarView(MySqlDataReader reader)
     {
         return new CarViewResponse(
-            CarId: reader.GetInt32("car_id"),
-            Brand: reader.GetString("brand"),
-            Model: reader.GetString("model"),
-            Supplier: reader.GetString("supplier"),
-            Vin: reader.GetString("vin"),
-            ManufactureYear: reader.GetInt32("manufacture_year"),
-            Color: reader.GetString("color"),
-            Mileage: reader.GetInt32("mileage"),
-            Price: reader.GetDecimal("price"),
-            Status: reader.GetString("status")
+            CarId: reader.GetInt32("ID"),
+            Brand: reader.GetString("Brand"),
+            Model: reader.GetString("Model"),
+            Supplier: reader.GetString("Supplier"),
+            Vin: reader.GetString("Vin"),
+            ManufactureYear: reader.GetInt32("Manufacture_Year"),
+            Color: reader.GetString("Color"),
+            Mileage: reader.GetInt32("Mileage"),
+            Price: reader.GetDecimal("Price"),
+            Status: reader.GetString("Status")
         );
     }
 }
