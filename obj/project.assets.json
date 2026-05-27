@@ -692,11 +692,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/oleksandr/develop/bd/CarDealershipAdoNet/CarDealershipAdoNet.csproj",
+      "projectUniqueName": "/home/oleksandr/develop/bd/Car_Dealership_Ado_Net/CarDealershipAdoNet.csproj",
       "projectName": "CarDealershipAdoNet",
-      "projectPath": "/home/oleksandr/develop/bd/CarDealershipAdoNet/CarDealershipAdoNet.csproj",
+      "projectPath": "/home/oleksandr/develop/bd/Car_Dealership_Ado_Net/CarDealershipAdoNet.csproj",
       "packagesPath": "/home/oleksandr/.nuget/packages/",
-      "outputPath": "/home/oleksandr/develop/bd/CarDealershipAdoNet/obj/",
+      "outputPath": "/home/oleksandr/develop/bd/Car_Dealership_Ado_Net/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/oleksandr/.nuget/NuGet/NuGet.Config"
